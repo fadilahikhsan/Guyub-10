@@ -7,20 +7,23 @@ import { revalidatePath } from "next/cache";
 /** Increment view counter setiap artikel dibuka */
 export async function incrementViews(pengumumanId: string) {
   const supabase = createAdminClient();
-  await supabase.rpc("increment_views", { row_id: pengumumanId }).catch(() => {
+  const { error } = await supabase.rpc("increment_views", { row_id: pengumumanId });
+  
+  if (error) {
     // Fallback manual jika RPC belum ada
-    supabase
+    const { data } = await supabase
       .from("pengumuman")
       .select("views")
       .eq("id", pengumumanId)
-      .single()
-      .then(({ data }) => {
-        supabase
-          .from("pengumuman")
-          .update({ views: (data?.views ?? 0) + 1 })
-          .eq("id", pengumumanId);
-      });
-  });
+      .single();
+      
+    if (data) {
+      await supabase
+        .from("pengumuman")
+        .update({ views: (data.views ?? 0) + 1 })
+        .eq("id", pengumumanId);
+    }
+  }
 }
 
 /** Submit komentar baru (masuk sebagai 'pending', menunggu approval admin) */
