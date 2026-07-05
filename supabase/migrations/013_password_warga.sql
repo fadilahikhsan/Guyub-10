@@ -1,0 +1,2 @@
+﻿ALTER TABLE profil_rw
+ADD COLUMN IF NOT EXISTS password_warga TEXT DEFAULT 'WargaRW10';

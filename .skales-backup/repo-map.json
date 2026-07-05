@@ -1,0 +1,655 @@
+{
+  "entries": [
+    {
+      "relPath": "eslint.config.mjs",
+      "language": "js",
+      "symbols": [],
+      "imports": [
+        "eslint/config",
+        "eslint-config-next/core-web-vitals",
+        "eslint-config-next/typescript"
+      ]
+    },
+    {
+      "relPath": "next.config.ts",
+      "language": "ts",
+      "symbols": [],
+      "imports": [
+        "next"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/actions.ts",
+      "language": "ts",
+      "symbols": [
+        "updateSuratStatus",
+        "createPengumuman",
+        "deletePengumuman",
+        "updatePengumuman",
+        "createKegiatan",
+        "updateKegiatan",
+        "deleteKegiatan",
+        "updateUmkmStatus",
+        "deleteUmkm",
+        "updateProfilRw",
+        "createTicker",
+        "updateTicker",
+        "deleteTicker",
+        "updateLembaga",
+        "createFasilitas",
+        "updateFasilitas",
+        "deleteFasilitas",
+        "createGaleri",
+        "deleteGaleri",
+        "createKas",
+        "updateKas",
+        "deleteKas",
+        "updateAspirasi",
+        "deleteAspirasi",
+        "createWarga",
+        "bulkInsertWarga",
+        "deleteWarga"
+      ],
+      "imports": [
+        "next/cache",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/AdminTabs.tsx",
+      "language": "tsx",
+      "symbols": [
+        "AdminTabs"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/AspirasiManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "AspirasiManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/FasilitasManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "FasilitasManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/GaleriManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "GaleriManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/KasManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "KasManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/KegiatanManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "KegiatanManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/layout.tsx",
+      "language": "tsx",
+      "symbols": [
+        "AdminLayout"
+      ],
+      "imports": [
+        "next/navigation",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/LembagaEditor.tsx",
+      "language": "tsx",
+      "symbols": [
+        "LembagaEditor"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "AdminDashboardPage"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "next/navigation",
+        "lucide-react",
+        "./SuratTable",
+        "./PengumumanManager",
+        "./KegiatanManager",
+        "./UmkmManager",
+        "./ProfilRwEditor",
+        "./TickerManager",
+        "./LembagaEditor",
+        "./FasilitasManager",
+        "./GaleriManager",
+        "./KasManager",
+        "./AspirasiManager",
+        "./WargaManager",
+        "./AdminTabs"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/PengumumanManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "PengumumanManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/ProfilRwEditor.tsx",
+      "language": "tsx",
+      "symbols": [
+        "ProfilRwEditor"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/SuratTable.tsx",
+      "language": "tsx",
+      "symbols": [
+        "SuratTable"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions",
+        "pdf-lib"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/TickerManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "TickerManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/UmkmManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "UmkmManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/admin/WargaManager.tsx",
+      "language": "tsx",
+      "symbols": [
+        "WargaManager"
+      ],
+      "imports": [
+        "react",
+        "lucide-react",
+        "./actions",
+        "xlsx"
+      ]
+    },
+    {
+      "relPath": "src/app/aspirasi/actions.ts",
+      "language": "ts",
+      "symbols": [
+        "submitAspirasi"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "next/cache"
+      ]
+    },
+    {
+      "relPath": "src/app/aspirasi/AspirasiList.tsx",
+      "language": "tsx",
+      "symbols": [
+        "AspirasiList"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/aspirasi/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "AspirasiPage"
+      ],
+      "imports": [
+        "react",
+        "next/link",
+        "lucide-react",
+        "./actions",
+        "./AspirasiList"
+      ]
+    },
+    {
+      "relPath": "src/app/darurat/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "DaruratPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/fasilitas/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "FasilitasPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/galeri/GalleryClient.tsx",
+      "language": "tsx",
+      "symbols": [
+        "GalleryClient"
+      ],
+      "imports": [
+        "react",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/galeri/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "GaleriPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "./GalleryClient",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/informasi/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "InformasiPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/kas/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "KasPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/kegiatan/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "KegiatanPage"
+      ],
+      "imports": [
+        "next/link",
+        "@/lib/supabase/server",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/layanan/actions.ts",
+      "language": "ts",
+      "symbols": [
+        "submitSurat"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "next/cache"
+      ]
+    },
+    {
+      "relPath": "src/app/layanan/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "LayananSuratPage"
+      ],
+      "imports": [
+        "react",
+        "next/link",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/layout.tsx",
+      "language": "tsx",
+      "symbols": [
+        "metadata",
+        "RootLayout"
+      ],
+      "imports": [
+        "next",
+        "next/font/google",
+        "@/components/layout/Navbar",
+        "@/components/layout/Footer"
+      ]
+    },
+    {
+      "relPath": "src/app/lembaga/[slug]/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "LembagaPage"
+      ],
+      "imports": [
+        "next/link",
+        "next/navigation",
+        "@/lib/supabase/server",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/login/actions.ts",
+      "language": "ts",
+      "symbols": [
+        "login",
+        "signup",
+        "logout"
+      ],
+      "imports": [
+        "next/cache",
+        "next/navigation",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/login/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "LoginPage"
+      ],
+      "imports": [
+        "react",
+        "next/link",
+        "lucide-react",
+        "./actions"
+      ]
+    },
+    {
+      "relPath": "src/app/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "Home"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/profil/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "ProfilRWPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/umkm/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "UMKMPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server"
+      ]
+    },
+    {
+      "relPath": "src/app/warga/actions.ts",
+      "language": "ts",
+      "symbols": [
+        "registerUmkm"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "next/cache"
+      ]
+    },
+    {
+      "relPath": "src/app/warga/ClientWargaTable.tsx",
+      "language": "tsx",
+      "symbols": [
+        "ClientWargaTable"
+      ],
+      "imports": [
+        "react",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/app/warga/layout.tsx",
+      "language": "tsx",
+      "symbols": [
+        "WargaLayout"
+      ],
+      "imports": []
+    },
+    {
+      "relPath": "src/app/warga/page.tsx",
+      "language": "tsx",
+      "symbols": [
+        "revalidate",
+        "WargaPage"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react",
+        "@/lib/supabase/server",
+        "./ClientWargaTable"
+      ]
+    },
+    {
+      "relPath": "src/app/warga/UmkmForm.tsx",
+      "language": "tsx",
+      "symbols": [
+        "UmkmForm"
+      ],
+      "imports": [
+        "react",
+        "./actions",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/components/layout/Footer.tsx",
+      "language": "tsx",
+      "symbols": [
+        "Footer"
+      ],
+      "imports": [
+        "next/link",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/components/layout/Navbar.tsx",
+      "language": "tsx",
+      "symbols": [
+        "Navbar"
+      ],
+      "imports": [
+        "@/lib/supabase/server",
+        "./NavbarClient"
+      ]
+    },
+    {
+      "relPath": "src/components/layout/NavbarClient.tsx",
+      "language": "tsx",
+      "symbols": [
+        "NavbarClient"
+      ],
+      "imports": [
+        "next/link",
+        "next/navigation",
+        "react",
+        "@supabase/supabase-js",
+        "lucide-react"
+      ]
+    },
+    {
+      "relPath": "src/components/ui/button.tsx",
+      "language": "tsx",
+      "symbols": [],
+      "imports": [
+        "@base-ui/react/button",
+        "class-variance-authority",
+        "@/lib/utils"
+      ]
+    },
+    {
+      "relPath": "src/lib/supabase/client.ts",
+      "language": "ts",
+      "symbols": [
+        "createClient"
+      ],
+      "imports": [
+        "@supabase/ssr"
+      ]
+    },
+    {
+      "relPath": "src/lib/supabase/middleware.ts",
+      "language": "ts",
+      "symbols": [
+        "updateSession"
+      ],
+      "imports": [
+        "@supabase/ssr",
+        "next/server"
+      ]
+    },
+    {
+      "relPath": "src/lib/supabase/server.ts",
+      "language": "ts",
+      "symbols": [
+        "createClient"
+      ],
+      "imports": [
+        "@supabase/ssr",
+        "next/headers"
+      ]
+    },
+    {
+      "relPath": "src/lib/utils.ts",
+      "language": "ts",
+      "symbols": [
+        "cn"
+      ],
+      "imports": [
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "relPath": "src/middleware.ts",
+      "language": "ts",
+      "symbols": [
+        "middleware",
+        "config"
+      ],
+      "imports": [
+        "next/server",
+        "@/lib/supabase/middleware"
+      ]
+    }
+  ],
+  "totalFiles": 53,
+  "indexedFiles": 51,
+  "method": "regex",
+  "generatedAt": 1782592240286,
+  "merkleRoot": "897833598c5dc78175b08454f9f50b84c431688d67e158b246c7f4002c39ae58"
+}
