@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Box, MapPin, Clock, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function FasilitasPage() {
   const supabase = await createClient();

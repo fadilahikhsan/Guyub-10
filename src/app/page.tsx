@@ -20,7 +20,7 @@ import { createClient } from "@/lib/supabase/server";
 import WidgetBar from "@/components/WidgetBar";
 import { InfografisWarga } from "@/components/InfografisWarga";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Home() {
   const supabase = await createClient();

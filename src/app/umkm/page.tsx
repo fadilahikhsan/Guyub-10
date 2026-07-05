@@ -1,9 +1,9 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import ClientUmkmList from "./ClientUmkmList";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function UMKMPage() {
   const supabase = await createClient();

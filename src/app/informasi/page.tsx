@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ChevronRight, Megaphone, Calendar } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
+export const revalidate = 60;
+
 export default async function InformasiPage() {
   const supabase = await createClient();
   const { data: pengumumanList } = await supabase

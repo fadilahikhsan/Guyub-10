@@ -1,9 +1,9 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ChevronRight, Calendar, MapPin, Clock, Info, LayoutList, CalendarDays } from "lucide-react";
 import KalenderView from "./KalenderView";
 
-export const revalidate = 0; // Dynamic route
+export const revalidate = 60; // Dynamic route
 
 export default async function KegiatanPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const resolvedParams = await searchParams;
