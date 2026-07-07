@@ -43,24 +43,59 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
     reader.onload = async (evt) => {
       try {
         const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
+        // raw: true preserves numbers as-is, cellText: true to get text representation
+        const wb = XLSX.read(bstr, { type: 'binary', cellText: true, cellDates: true });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws);
+        // defval: "" so empty cells become empty strings, raw: false so numbers come as text
+        const data = XLSX.utils.sheet_to_json(ws, { raw: false, defval: "" });
+
+        // Helper: convert any number-like value to a clean integer string
+        const toIdStr = (val: any): string => {
+          if (!val && val !== 0) return "";
+          const s = String(val).trim();
+          // Handle scientific notation e.g. "3.2010245e+15"
+          if (s.toLowerCase().includes('e')) {
+            try {
+              return BigInt(Math.round(Number(s))).toString();
+            } catch {
+              return s.replace(/[^0-9]/g, '');
+            }
+          }
+          // Remove decimals if any (e.g. "3201024000.0" → "3201024000")
+          return s.split('.')[0].replace(/[^0-9]/g, '');
+        };
         
         if (data.length > 0) {
           const rows = data.map((d: any) => ({
-            nik: String(d["NIK"] || d["nik"] || Date.now().toString()), 
-            no_kk: String(d["No KK"] || d["no_kk"] || ""),
-            nama_lengkap: d["Nama Lengkap"] || d["nama_lengkap"] || "Tanpa Nama",
-            tempat_lahir: d["Tempat Lahir"] || d["tempat_lahir"] || "",
-            jenis_kelamin: d["L/P"] || d["jenis_kelamin"] || "L",
-            agama: d["Agama"] || d["agama"] || "Islam",
-            rt: String(d["RT"] || d["rt"] || "001"),
-            alamat: d["Alamat"] || d["alamat"] || ""
+            nik: toIdStr(d["NIK"] || d["nik"] || "").slice(0, 16),
+            no_kk: toIdStr(d["No KK"] || d["no_kk"] || "").slice(0, 20),
+            nama_lengkap: String(d["Nama Lengkap"] || d["nama_lengkap"] || "Tanpa Nama").trim(),
+            tempat_lahir: String(d["Tempat Lahir"] || d["tempat_lahir"] || "").trim(),
+            jenis_kelamin: String(d["L/P"] || d["jenis_kelamin"] || "L").trim().toUpperCase().slice(0, 1),
+            agama: String(d["Agama"] || d["agama"] || "Islam").trim(),
+            rt: String(d["RT"] || d["rt"] || "001").trim().padStart(3, '0'),
+            alamat: String(d["Alamat"] || d["alamat"] || "").trim(),
+            tanggal_lahir: d["Tanggal Lahir"] || d["tanggal_lahir"] || null,
+            status_perkawinan: String(d["Status"] || d["status_perkawinan"] || "").trim(),
+            pekerjaan: String(d["Pekerjaan"] || d["pekerjaan"] || "").trim(),
+            pendidikan: String(d["Pendidikan"] || d["pendidikan"] || "").trim(),
           }));
           
-          setPreviewData(rows);
+          // Validate - filter out rows with invalid NIK
+          const validRows = rows.filter(r => r.nik.length >= 10 && r.nama_lengkap);
+          const skipped = rows.length - validRows.length;
+
+          if (validRows.length === 0) {
+            alert("Tidak ada data valid ditemukan. Pastikan kolom NIK dan Nama Lengkap terisi.");
+            return;
+          }
+
+          if (skipped > 0) {
+            alert(`Peringatan: ${skipped} baris dilewati karena NIK tidak valid. ${validRows.length} baris siap diimport.`);
+          }
+          
+          setPreviewData(validRows);
         } else {
           alert("Data Excel kosong.");
         }
@@ -73,6 +108,7 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
     };
     reader.readAsBinaryString(file);
   };
+
 
   const handleConfirmImport = async () => {
     if (!previewData) return;
