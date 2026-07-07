@@ -3,6 +3,7 @@ import { Roboto, Bitter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import BackButton from "@/components/ui/BackButton";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -41,6 +42,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Navbar />
         <main className="flex-1 flex flex-col">{children}</main>
+        <BackButton />
         <Footer />
       </body>
     </html>
