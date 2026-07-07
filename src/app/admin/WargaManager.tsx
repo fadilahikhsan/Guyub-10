@@ -135,18 +135,31 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
           
           // Validate - filter out rows with invalid NIK
           const validRows = rows.filter(r => r.nik.length >= 10 && r.nama_lengkap);
+          
+          // Deduplicate by NIK (keep the last occurrence)
+          const uniqueRowsMap = new Map();
+          for (const row of validRows) {
+            uniqueRowsMap.set(row.nik, row);
+          }
+          const uniqueRows = Array.from(uniqueRowsMap.values());
+          
           const skipped = rows.length - validRows.length;
+          const duplicates = validRows.length - uniqueRows.length;
 
-          if (validRows.length === 0) {
+          if (uniqueRows.length === 0) {
             alert("Tidak ada data valid ditemukan. Pastikan kolom NIK dan Nama Lengkap terisi.");
             return;
           }
 
-          if (skipped > 0) {
-            alert(`Peringatan: ${skipped} baris dilewati karena NIK tidak valid. ${validRows.length} baris siap diimport.`);
+          if (skipped > 0 || duplicates > 0) {
+            let msg = `Peringatan:\n`;
+            if (skipped > 0) msg += `- ${skipped} baris dilewati karena NIK tidak valid.\n`;
+            if (duplicates > 0) msg += `- ${duplicates} baris duplikat NIK digabungkan.\n`;
+            msg += `\nTotal ${uniqueRows.length} baris siap diimport.`;
+            alert(msg);
           }
           
-          setPreviewData(validRows);
+          setPreviewData(uniqueRows);
         } else {
           alert("Data Excel kosong.");
         }
