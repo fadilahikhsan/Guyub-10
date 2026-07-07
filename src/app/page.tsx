@@ -20,7 +20,7 @@ import {
 
 import { createClient } from "@/lib/supabase/server";
 
-const WidgetBar = dynamic(() => import("@/components/WidgetBar"), { ssr: false });
+const WidgetBar = dynamic(() => import("@/components/WidgetBar"));
 const InfografisWarga = dynamic(() => import("@/components/InfografisWarga").then(mod => mod.InfografisWarga), { 
   loading: () => <div className="h-[400px] w-full flex items-center justify-center text-muted-foreground">Memuat Statistik...</div> 
 });
