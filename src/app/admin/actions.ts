@@ -751,7 +751,7 @@ export async function createWarga(formData: FormData) {
 export async function bulkInsertWarga(rows: any[]) {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase.from("warga").insert(rows);
+    const { error } = await supabase.from("warga").upsert(rows, { onConflict: 'nik' });
     if (error) throw error;
 
     revalidatePath("/admin");
