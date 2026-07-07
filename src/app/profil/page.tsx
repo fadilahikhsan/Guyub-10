@@ -229,28 +229,7 @@ export default async function ProfilRWPage() {
           </div>
         </section>
 
-        {/* RT & Lembaga (Link Dinamis) */}
-        {lembagaList && lembagaList.length > 0 && (
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-1 h-8 bg-primary rounded-full" />
-              <h2 className="text-2xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
-                Daftar RT & Lembaga
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {lembagaList.map((lembaga) => {
-                const Icon = getIcon(lembaga.slug);
-                return (
-                <Link key={lembaga.slug} href={`/lembaga/${lembaga.slug}`} className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 group shadow-sm ${getColor(lembaga.slug)}`}>
-                  <Icon className="w-10 h-10 mb-3" />
-                  <span className="font-bold text-base text-center line-clamp-1">{lembaga.nama}</span>
-                  <span className="text-xs opacity-80 mt-1 flex items-center gap-1 group-hover:underline">Lihat Profil <ChevronRight className="w-3 h-3" /></span>
-                </Link>
-              )})}
-            </div>
-          </section>
-        )}
+
 
         {/* Visi & Misi */}
         <section>

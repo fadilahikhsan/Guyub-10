@@ -10,7 +10,7 @@ export default async function RtIndexPage() {
   const supabase = await createClient();
   const adminSupabase = createAdminClient();
 
-  const rtList = ['01', '02', '03', '04', '05', '06', '07', '08'];
+  const rtList = ['01', '02', '03', '04'];
   
   const [
     { data: profilRt },

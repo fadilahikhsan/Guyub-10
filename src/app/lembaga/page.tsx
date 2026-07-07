@@ -12,6 +12,8 @@ export default async function LembagaIndexPage() {
     .select("slug, nama, deskripsi, ketua_nama, ketua_foto_url")
     .order("slug", { ascending: true });
 
+  const filteredLembaga = lembagaList?.filter(l => !l.slug.startsWith('rt')) || [];
+
   const getIcon = (slug: string) => {
     if (slug.includes("pkk")) return Heart;
     if (slug.includes("posyandu")) return Shield;
@@ -69,15 +71,15 @@ export default async function LembagaIndexPage() {
 
       {/* Grid Lembaga */}
       <section className="container mx-auto px-4 max-w-6xl py-12 md:py-16">
-        {!lembagaList || lembagaList.length === 0 ? (
+        {filteredLembaga.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
             <p className="font-bold text-lg">Data lembaga belum tersedia.</p>
             <p className="text-sm">Silakan hubungi admin untuk mengisi data lembaga.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {lembagaList.map((lembaga) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredLembaga.map((lembaga) => {
               const Icon = getIcon(lembaga.slug);
               const gradient = getGradient(lembaga.slug);
               return (

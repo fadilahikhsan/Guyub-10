@@ -139,10 +139,6 @@ export default function KasClient({ initialData }: { initialData: KasData[] }) {
               <option value="RT-02">RT 02</option>
               <option value="RT-03">RT 03</option>
               <option value="RT-04">RT 04</option>
-              <option value="RT-05">RT 05</option>
-              <option value="RT-06">RT 06</option>
-              <option value="RT-07">RT 07</option>
-              <option value="RT-08">RT 08</option>
               <option disabled>── KAS LEMBAGA ──</option>
               <option value="LEMBAGA-pkk">PKK</option>
               <option value="LEMBAGA-karang-taruna">Karang Taruna</option>

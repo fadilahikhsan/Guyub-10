@@ -8,7 +8,7 @@ export function ProfilRtManager({ data }: { data: any[] }) {
   const [isPending, startTransition] = useTransition();
   const [editingRt, setEditingRt] = useState<string | null>(null);
 
-  const rtList = ['01', '02', '03', '04', '05', '06', '07', '08'];
+  const rtList = ['01', '02', '03', '04'];
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>, no_rt: string) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ export function ProfilRtManager({ data }: { data: any[] }) {
         <Users className="w-6 h-6 text-primary" />
         <div>
           <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: "var(--font-bitter)" }}>Profil RT</h2>
-          <p className="text-sm text-muted-foreground">Kelola informasi ketua dan profil masing-masing RT (01 - 08).</p>
+          <p className="text-sm text-muted-foreground">Kelola informasi ketua dan profil masing-masing RT (01 - 04).</p>
         </div>
       </div>
 
