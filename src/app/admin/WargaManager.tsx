@@ -65,6 +65,46 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
           // Remove decimals if any (e.g. "3201024000.0" → "3201024000")
           return s.split('.')[0].replace(/[^0-9]/g, '');
         };
+
+        // Helper: convert dates like "23-11-2002" or JS Dates into "YYYY-MM-DD"
+        const parseDate = (val: any): string | null => {
+          if (!val) return null;
+          if (val instanceof Date) {
+            if (isNaN(val.getTime())) return null;
+            return val.toISOString().split('T')[0];
+          }
+          const s = String(val).trim();
+          // Match standard YYYY-MM-DD
+          if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+          
+          // Match DD-MM-YYYY or DD/MM/YYYY
+          const parts = s.split(/[-/]/);
+          if (parts.length === 3) {
+            let day = parts[0];
+            let month = parts[1];
+            let year = parts[2];
+            
+            // If year is first (YYYY-MM-DD)
+            if (parts[0].length === 4) {
+              year = parts[0];
+              month = parts[1];
+              day = parts[2];
+            } else if (parts[2].length === 2) {
+              // 2-digit year (assume 19xx or 20xx based on value)
+              const y = parseInt(parts[2], 10);
+              year = y < 50 ? `20${parts[2]}` : `19${parts[2]}`;
+            }
+            
+            month = month.padStart(2, '0');
+            day = day.padStart(2, '0');
+            
+            const iso = `${year}-${month}-${day}`;
+            if (!isNaN(new Date(iso).getTime())) {
+              return iso;
+            }
+          }
+          return null;
+        };
         
         if (data.length > 0) {
           const rows = data.map((d: any) => ({
@@ -76,7 +116,7 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
             agama: String(d["Agama"] || d["agama"] || "Islam").trim(),
             rt: String(d["RT"] || d["rt"] || "001").trim().padStart(3, '0'),
             alamat: String(d["Alamat"] || d["alamat"] || "").trim(),
-            tanggal_lahir: d["Tanggal Lahir"] || d["tanggal_lahir"] || null,
+            tanggal_lahir: parseDate(d["Tanggal Lahir"] || d["tanggal_lahir"]),
             status_perkawinan: String(d["Status"] || d["status_perkawinan"] || "").trim(),
             pekerjaan: String(d["Pekerjaan"] || d["pekerjaan"] || "").trim(),
             pendidikan: String(d["Pendidikan"] || d["pendidikan"] || "").trim(),
