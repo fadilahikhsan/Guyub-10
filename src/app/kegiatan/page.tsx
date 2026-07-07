@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ChevronRight, Calendar, MapPin, Clock, Info, LayoutList, CalendarDays } from "lucide-react";
@@ -61,7 +62,21 @@ export default async function KegiatanPage({ searchParams }: { searchParams: Pro
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-emerald-800 to-highlight geo-pattern">
+      <section className="relative overflow-hidden min-h-[240px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80"
+            alt="Agenda Kegiatan Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-[rgba(13,33,25,0.92)]" />
+
         <div className="absolute top-8 right-8 w-48 h-48 border border-white/10 rounded-full" />
         <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
 

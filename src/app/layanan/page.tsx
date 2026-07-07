@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, FileText, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
 import { submitSurat } from "./actions";
@@ -136,24 +137,41 @@ export default function LayananSuratPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pt-12 pb-20 bg-background">
-      <section className="container mx-auto px-4 max-w-3xl mb-8">
-        <div className="flex items-center text-sm font-bold text-muted-foreground mb-6">
-          <Link href="/" className="hover:text-primary transition-colors">Beranda</Link>
-          <ChevronRight className="h-4 w-4 mx-2" />
-          <span className="text-foreground">Layanan Surat</span>
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Hero Wallpaper */}
+      <section className="relative overflow-hidden min-h-[240px]">
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80"
+            alt="Layanan Surat Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
         </div>
-        
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 flex items-center text-foreground" style={{ fontFamily: "var(--font-bitter)" }}>
-          <FileText className="mr-4 text-primary w-10 h-10 md:w-12 md:h-12" />
-          Pengajuan Surat
-        </h1>
-        <p className="text-lg text-muted-foreground font-medium">
-          Isi formulir pengajuan di bawah ini.
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-[rgba(13,33,25,0.93)]" />
+        <div className="container mx-auto px-4 max-w-3xl py-16 relative z-10">
+          <div className="flex items-center text-sm font-bold text-white/80 mb-6">
+            <Link href="/" className="hover:text-white transition-colors">Beranda</Link>
+            <ChevronRight className="h-4 w-4 mx-2" />
+            <span className="text-white">Layanan Surat</span>
+          </div>
+          <div className="flex items-center gap-4 mb-3">
+            <div className="bg-white/10 p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
+              <FileText className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight" style={{ fontFamily: "var(--font-bitter)" }}>
+              Pengajuan Surat
+            </h1>
+          </div>
+          <p className="text-white/90 text-lg font-medium">
+            Ajukan surat pengantar secara online, mudah dan cepat.
+          </p>
+        </div>
       </section>
 
-      <section className="container mx-auto px-4 max-w-3xl">
+      <section className="container mx-auto px-4 max-w-3xl py-12">
         <div className="bg-white rounded-2xl p-6 md:p-10 border border-border shadow-md">
           
           {/* Progress Bar */}

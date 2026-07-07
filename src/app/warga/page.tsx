@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Database, Users, Activity, Lock, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -37,8 +38,22 @@ export default async function WargaPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-emerald-800 to-highlight geo-pattern">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[100px]" />
+      <section className="relative overflow-hidden min-h-[280px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80"
+            alt="Database Warga Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-[rgba(13,33,25,0.93)]" />
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[100px]" />
         
         <div className="container mx-auto px-4 max-w-6xl py-16 md:py-24 relative z-10 text-center">
           <div className="flex items-center justify-center text-sm font-bold text-white/80 mb-6">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -56,7 +57,22 @@ export default async function ProfilRWPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-emerald-800 to-highlight geo-pattern">
+      <section className="relative overflow-hidden min-h-[260px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
+            alt="Profil RW Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-[rgba(13,33,25,0.92)]" />
+
+        {/* Dekoratif */}
         <div className="absolute top-8 right-8 w-48 h-48 border border-white/10 rounded-full" />
         <div className="absolute top-16 right-16 w-32 h-32 border border-white/10 rounded-full" />
         <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-white/5 rounded-full blur-3xl" />

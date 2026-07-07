@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ChevronRight, Wrench, Clock, MapPin, Search } from "lucide-react";
 import LaporanForm from "./LaporanForm";
@@ -35,8 +36,22 @@ export default async function LaporanPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-emerald-800 to-highlight geo-pattern">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[80px]" />
+      <section className="relative overflow-hidden min-h-[280px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1487621167305-5d248087c724?w=1600&q=80"
+            alt="Laporan Warga Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/70 to-[rgba(13,33,25,0.93)]" />
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[80px]" />
         
         <div className="container mx-auto px-4 max-w-6xl py-16 md:py-24 relative z-10 text-center">
           <div className="flex items-center justify-center text-sm font-bold text-white/80 mb-6">
