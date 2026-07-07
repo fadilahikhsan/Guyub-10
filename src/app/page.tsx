@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const WidgetBar = dynamic(() => import("@/components/WidgetBar"));
 const InfografisWarga = dynamic(() => import("@/components/InfografisWarga").then(mod => mod.InfografisWarga), { 
@@ -29,6 +30,7 @@ export const revalidate = 60;
 
 export default async function Home() {
   const supabase = await createClient();
+  const adminSupabase = createAdminClient();
 
   const [
     { data: articlesList },
@@ -43,7 +45,7 @@ export default async function Home() {
     supabase.from("ticker").select("*").eq("aktif", true).order("urutan", { ascending: true }),
     supabase.from("kegiatan").select("*").gte("tanggal", new Date().toISOString()).order("tanggal", { ascending: true }).limit(3),
     supabase.from("umkm").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(4),
-    supabase.from("warga").select("rt, jenis_kelamin, tanggal_lahir, no_kk")
+    adminSupabase.from("warga").select("rt, jenis_kelamin, tanggal_lahir, no_kk")
   ]);
 
   const stats = [
