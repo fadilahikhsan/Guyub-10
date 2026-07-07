@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Camera } from "lucide-react";
 import GalleryClient from "./GalleryClient";
@@ -24,7 +25,21 @@ export default async function GaleriPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-navy to-black geo-pattern">
+      <section className="relative overflow-hidden min-h-[300px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=1600&q=80"
+            alt="Galeri Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/80 to-[rgba(13,33,25,0.95)]" />
+
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[100px]" />
         
         <div className="container mx-auto px-4 max-w-6xl py-16 md:py-24 relative z-10 text-center">

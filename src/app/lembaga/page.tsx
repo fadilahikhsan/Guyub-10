@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ChevronRight, Users, Building, Heart, Shield, ArrowRight } from "lucide-react";
@@ -29,15 +30,30 @@ export default async function LembagaIndexPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary to-secondary pt-28 pb-16">
-        <div className="absolute inset-0 geo-pattern opacity-30" />
-        <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          <div className="flex items-center text-sm font-bold text-white/70 mb-6">
+      <section className="relative overflow-hidden min-h-[300px]">
+        {/* Wallpaper */}
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&q=80"
+            alt="Lembaga Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/80 to-[rgba(13,33,25,0.95)]" />
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[100px]" />
+        
+        <div className="container mx-auto px-4 max-w-6xl py-20 relative z-10 text-center">
+          <div className="flex items-center justify-center text-sm font-bold text-white/70 mb-6">
             <Link href="/" className="hover:text-white transition-colors">Beranda</Link>
             <ChevronRight className="h-4 w-4 mx-2" />
             <span className="text-white">Lembaga RW</span>
           </div>
-          <div className="max-w-2xl">
+          <div className="max-w-2xl mx-auto">
             <span className="inline-block bg-white/20 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider mb-4">
               Struktur Organisasi
             </span>
