@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ChevronRight, Calendar, Users, MapPin, Clock, Megaphone, Building, Heart, Shield } from "lucide-react";
+import { ChevronRight, Calendar, Users, MapPin, Clock, Megaphone, Building, Heart, Shield, Wallet, TrendingUp, TrendingDown } from "lucide-react";
 
 export const revalidate = 0;
 
@@ -41,20 +41,35 @@ export default async function LembagaPage({ params }: { params: Promise<{ slug: 
     badgeColor = "bg-indigo-100 text-indigo-700";
   }
 
-  // Ambil kegiatan khusus penyelenggara ini (match name or slug)
+  // Ambil kegiatan khusus lembaga ini (menggunakan penyelenggara_type baru)
   const { data: kegiatan } = await supabase
     .from("kegiatan")
     .select("*")
-    .ilike("penyelenggara", `%${lembaga.nama}%`)
+    .eq("penyelenggara_type", "Lembaga")
+    .eq("penyelenggara_id", slug)
     .order("tanggal", { ascending: true });
 
-  // Ambil pengumuman khusus penyelenggara ini
+  // Ambil pengumuman khusus lembaga
   const { data: pengumuman } = await supabase
     .from("pengumuman")
     .select("*")
-    .ilike("penyelenggara", `%${lembaga.nama}%`)
     .order("created_at", { ascending: false })
     .limit(5);
+
+  // Ambil kas lembaga
+  const { data: kasLembaga } = await supabase
+    .from("kas")
+    .select("*")
+    .eq("entitas_type", "Lembaga")
+    .eq("entitas_id", slug)
+    .order("tanggal", { ascending: false });
+
+  let totalMasuk = 0;
+  let totalKeluar = 0;
+  kasLembaga?.forEach(k => {
+    if (k.jenis === 'masuk') totalMasuk += Number(k.jumlah);
+    else totalKeluar += Number(k.jumlah);
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -151,6 +166,63 @@ export default async function LembagaPage({ params }: { params: Promise<{ slug: 
                 </div>
               )}
             </div>
+
+            {/* Laporan Kas Lembaga */}
+            <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-48 h-48 bg-emerald-500/10 blur-[60px] rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white/10 rounded-xl"><Wallet className="w-5 h-5" /></div>
+                  <h2 className="text-lg font-black uppercase tracking-wider">Kas {lembaga.nama}</h2>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-1 text-emerald-400 text-xs font-bold mb-1"><TrendingUp className="w-3.5 h-3.5" /> Masuk</div>
+                    <p className="font-black text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalMasuk)}</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-1 text-rose-400 text-xs font-bold mb-1"><TrendingDown className="w-3.5 h-3.5" /> Keluar</div>
+                    <p className="font-black text-lg">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalKeluar)}</p>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-1 text-highlight text-xs font-bold mb-1"><Wallet className="w-3.5 h-3.5" /> Saldo</div>
+                    <p className={`font-black text-lg ${(totalMasuk - totalKeluar) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalMasuk - totalKeluar)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Riwayat Kas Lembaga */}
+            {kasLembaga && kasLembaga.length > 0 && (
+              <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-zinc-100 flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-primary" />
+                  <h3 className="font-black text-sm uppercase tracking-wider text-slate-700">Riwayat Transaksi</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 border-b">
+                        <th className="text-left py-2.5 px-4 text-xs font-bold text-slate-500 uppercase">Tanggal</th>
+                        <th className="text-left py-2.5 px-4 text-xs font-bold text-slate-500 uppercase">Keterangan</th>
+                        <th className="text-right py-2.5 px-4 text-xs font-bold text-slate-500 uppercase">Jumlah</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {kasLembaga.slice(0, 10).map((item) => (
+                        <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/50">
+                          <td className="py-2.5 px-4 text-slate-600 whitespace-nowrap">{new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                          <td className="py-2.5 px-4 text-slate-800 font-semibold">{item.keterangan}</td>
+                          <td className={`py-2.5 px-4 text-right font-black whitespace-nowrap ${item.jenis === 'masuk' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {item.jenis === 'masuk' ? '+' : '-'}{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.jumlah)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-2 border-b pb-3">
               <Calendar className="w-6 h-6 text-primary" />

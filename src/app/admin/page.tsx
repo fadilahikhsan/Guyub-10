@@ -10,6 +10,7 @@ import { PengumumanManager } from "./PengumumanManager";
 import KegiatanManager from "./KegiatanManager";
 import { UmkmManager } from "./UmkmManager";
 import { ProfilRwEditor } from "./ProfilRwEditor";
+import { ProfilRtManager } from "./ProfilRtManager";
 import { TickerManager } from "./TickerManager";
 import { LembagaEditor } from "./LembagaEditor";
 import { FasilitasManager } from "./FasilitasManager";
@@ -26,6 +27,7 @@ export const revalidate = 0;
 const MENU_ITEMS = [
   { key: "overview", label: "Overview", icon: "BarChart3" },
   { key: "profil", label: "Profil RW", icon: "Landmark" },
+  { key: "profil_rt", label: "Profil RT", icon: "Users" },
   { key: "ticker", label: "Ticker", icon: "Type" },
   { key: "pengumuman", label: "Berita Warga", icon: "Megaphone" },
   { key: "kegiatan", label: "Kegiatan", icon: "Calendar" },
@@ -75,6 +77,7 @@ export default async function AdminDashboardPage({
     { data: wargaList },
     { data: laporanList },
     { data: komentarListAdmin },
+    { data: profilRtList },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }),
     supabase.from("surat").select("*", { count: "exact", head: true }).eq("status", "pending"),
@@ -98,6 +101,7 @@ export default async function AdminDashboardPage({
     supabase.from("warga").select("*").order("nama_lengkap", { ascending: true }),
     supabase.from("laporan_infrastruktur").select("*").order("created_at", { ascending: false }),
     supabase.from("komentar_pengumuman").select('id, nama, email, isi, status, created_at, pengumuman_id, pengumuman(judul)').order("created_at", { ascending: false }),
+    supabase.from("profil_rt").select("*").order("no_rt", { ascending: true }),
   ]);
 
   const stats = [
@@ -158,6 +162,11 @@ export default async function AdminDashboardPage({
       {/* ── PROFIL RW TAB ── */}
       {activeTab === "profil" && (
         <ProfilRwEditor data={profilRw} />
+      )}
+
+      {/* ── PROFIL RT TAB ── */}
+      {activeTab === "profil_rt" && (
+        <ProfilRtManager data={profilRtList ?? []} />
       )}
 
       {/* ── TICKER TAB ── */}

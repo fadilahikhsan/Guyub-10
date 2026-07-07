@@ -141,6 +141,8 @@ export async function createKegiatan(formData: FormData) {
     const lokasi = formData.get("lokasi") as string;
     const kategori = formData.get("kategori") as string;
     const penyelenggara = formData.get("penyelenggara") as string || "Pengurus RW";
+    const penyelenggara_type = formData.get("penyelenggara_type") as string || "RW";
+    const penyelenggara_id = formData.get("penyelenggara_id") as string || "RW";
     
     const tanggalInput = formData.get("tanggal") as string; 
     const tanggal = new Date(tanggalInput).toISOString();
@@ -152,6 +154,8 @@ export async function createKegiatan(formData: FormData) {
       lokasi,
       kategori,
       penyelenggara,
+      penyelenggara_type,
+      penyelenggara_id,
     };
 
     const foto = formData.get("foto") as File | null;
@@ -186,6 +190,8 @@ export async function updateKegiatan(id: string, formData: FormData) {
     const lokasi = formData.get("lokasi") as string;
     const kategori = formData.get("kategori") as string;
     const penyelenggara = formData.get("penyelenggara") as string || "Pengurus RW";
+    const penyelenggara_type = formData.get("penyelenggara_type") as string || "RW";
+    const penyelenggara_id = formData.get("penyelenggara_id") as string || "RW";
     const tanggalInput = formData.get("tanggal") as string;
     const tanggal = new Date(tanggalInput).toISOString();
 
@@ -196,6 +202,8 @@ export async function updateKegiatan(id: string, formData: FormData) {
       lokasi,
       kategori,
       penyelenggara,
+      penyelenggara_type,
+      penyelenggara_id,
     };
 
     const foto = formData.get("foto") as File | null;
@@ -235,6 +243,47 @@ export async function deleteKegiatan(id: string) {
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to delete kegiatan" };
+  }
+}
+
+export async function updateProfilRt(no_rt: string, formData: FormData) {
+  try {
+    const supabase = createAdminClient();
+    
+    const updateData: Record<string, any> = {
+      no_rt,
+      ketua_nama: formData.get("ketua_nama") as string,
+      sambutan: formData.get("sambutan") as string,
+      visi_misi: formData.get("visi_misi") as string,
+      kontak: formData.get("kontak") as string,
+    };
+
+    const foto = formData.get("foto") as File | null;
+    if (foto && foto.size > 0) {
+      const ext = foto.name.split(".").pop();
+      const fileName = `rt_${no_rt}_${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("galeri").upload(fileName, foto);
+      if (!upErr) {
+        const { data: urlData } = supabase.storage.from("galeri").getPublicUrl(fileName);
+        updateData.ketua_foto_url = urlData.publicUrl;
+      }
+    }
+
+    const { data: existing } = await supabase.from("profil_rt").select("id").eq("no_rt", no_rt).single();
+
+    if (existing) {
+      const { error } = await supabase.from("profil_rt").update(updateData).eq("no_rt", no_rt);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("profil_rt").insert(updateData);
+      if (error) throw error;
+    }
+
+    revalidatePath("/admin");
+    revalidatePath(`/rt/${no_rt}`);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal update profil RT" };
   }
 }
 
@@ -623,12 +672,14 @@ export async function createKas(formData: FormData) {
     const jenis = formData.get("jenis") as string;
     const jumlah = parseInt(formData.get("jumlah") as string, 10);
     const kategori = formData.get("kategori") as string || "umum";
+    const entitas_type = formData.get("entitas_type") as string || "RW";
+    const entitas_id = formData.get("entitas_id") as string || "RW";
 
     if (!tanggal || !keterangan || !jenis || isNaN(jumlah)) {
       return { success: false, error: "Semua field wajib diisi." };
     }
 
-    const { error } = await supabase.from("kas").insert({ tanggal, keterangan, jenis, jumlah, kategori });
+    const { error } = await supabase.from("kas").insert({ tanggal, keterangan, jenis, jumlah, kategori, entitas_type, entitas_id });
     if (error) throw error;
 
     revalidatePath("/admin");
@@ -642,12 +693,14 @@ export async function createKas(formData: FormData) {
 export async function updateKas(id: string, formData: FormData) {
   try {
     const supabase = createAdminClient();
-    const updateData = {
+    const updateData: any = {
       tanggal: formData.get("tanggal") as string,
       keterangan: formData.get("keterangan") as string,
       jenis: formData.get("jenis") as string,
       jumlah: parseInt(formData.get("jumlah") as string, 10),
       kategori: formData.get("kategori") as string || "umum",
+      entitas_type: formData.get("entitas_type") as string || "RW",
+      entitas_id: formData.get("entitas_id") as string || "RW",
     };
 
     const { error } = await supabase.from("kas").update(updateData).eq("id", id);

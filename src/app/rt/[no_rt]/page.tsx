@@ -1,0 +1,275 @@
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { ChevronRight, Home, Users, Phone, MapPin, Calendar, Clock } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const RtCharts = dynamic(() => import("./RtCharts"), {
+  loading: () => <div className="h-[400px] w-full flex items-center justify-center text-muted-foreground">Memuat Statistik...</div>,
+});
+
+export const revalidate = 60;
+
+export default async function RtDashboardPage({ params }: { params: Promise<{ no_rt: string }> }) {
+  const resolvedParams = await params;
+  const noRt = resolvedParams.no_rt;
+
+  const supabase = await createClient();
+  const adminSupabase = createAdminClient();
+
+  // Ambil profil RT
+  const { data: profilRt } = await supabase
+    .from("profil_rt")
+    .select("*")
+    .eq("no_rt", noRt)
+    .single();
+
+  // Ambil semua data secara paralel
+  const [
+    { data: wargaData },
+    { data: kasData },
+    { data: kegiatanData },
+  ] = await Promise.all([
+    adminSupabase.from("warga").select("jenis_kelamin, tanggal_lahir, no_kk").eq("rt", noRt),
+    supabase.from("kas").select("*").eq("entitas_type", "RT").eq("entitas_id", noRt).order("tanggal", { ascending: false }),
+    supabase.from("kegiatan").select("*").eq("penyelenggara_type", "RT").eq("penyelenggara_id", noRt).order("tanggal", { ascending: true }),
+  ]);
+
+  // ── Hitung statistik warga ──
+  const totalWarga = wargaData?.length || 0;
+  const noKkSet = new Set(wargaData?.map(w => w.no_kk).filter(Boolean));
+  const totalKK = noKkSet.size;
+
+  let countLaki = 0;
+  let countPerempuan = 0;
+  const ageCounts: Record<string, number> = { '0-5 (Balita)': 0, '6-12 (Anak)': 0, '13-17 (Remaja)': 0, '18-59 (Dewasa)': 0, '60+ (Lansia)': 0 };
+
+  wargaData?.forEach(w => {
+    if (w.jenis_kelamin === 'L') countLaki++;
+    else if (w.jenis_kelamin === 'P') countPerempuan++;
+
+    if (w.tanggal_lahir) {
+      const birthDate = new Date(w.tanggal_lahir);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+      if (age <= 5) ageCounts['0-5 (Balita)']++;
+      else if (age <= 12) ageCounts['6-12 (Anak)']++;
+      else if (age <= 17) ageCounts['13-17 (Remaja)']++;
+      else if (age <= 59) ageCounts['18-59 (Dewasa)']++;
+      else ageCounts['60+ (Lansia)']++;
+    }
+  });
+
+  const genderData = [
+    { name: 'Laki-laki', value: countLaki },
+    { name: 'Perempuan', value: countPerempuan }
+  ];
+  const ageData = Object.entries(ageCounts).map(([name, value]) => ({ name, value }));
+
+  // ── Hitung kas ──
+  let totalMasuk = 0;
+  let totalKeluar = 0;
+  kasData?.forEach(k => {
+    if (k.jenis === 'masuk') totalMasuk += Number(k.jumlah);
+    else totalKeluar += Number(k.jumlah);
+  });
+
+  const kasSummary = {
+    totalMasuk,
+    totalKeluar,
+    saldo: totalMasuk - totalKeluar,
+    kasData: kasData || [],
+  };
+
+  // Warna gradient RT
+  const rtColors: Record<string, string> = {
+    '01': 'from-sky-600 to-blue-800',
+    '02': 'from-emerald-600 to-teal-800',
+    '03': 'from-violet-600 to-purple-800',
+    '04': 'from-amber-500 to-orange-700',
+    '05': 'from-rose-600 to-pink-800',
+    '06': 'from-indigo-600 to-blue-900',
+    '07': 'from-teal-600 to-cyan-800',
+    '08': 'from-fuchsia-600 to-pink-800',
+  };
+  const gradient = rtColors[noRt] || 'from-primary to-secondary';
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* ── Hero Banner ───────────────────── */}
+      <section className={`relative overflow-hidden bg-gradient-to-br ${gradient}`}>
+        <div className="absolute inset-0 geo-pattern opacity-20" />
+        <div className="absolute top-10 right-10 w-52 h-52 border border-white/10 rounded-full" />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+
+        <div className="container mx-auto px-4 max-w-6xl py-14 md:py-20 relative z-10">
+          <div className="flex items-center text-sm font-bold text-white/70 mb-6">
+            <Link href="/" className="hover:text-white transition-colors">Beranda</Link>
+            <ChevronRight className="h-4 w-4 mx-2" />
+            <span className="text-white">RT {noRt}</span>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
+            {profilRt?.ketua_foto_url ? (
+              <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl overflow-hidden flex-shrink-0 bg-white">
+                <img src={profilRt.ketua_foto_url} alt={profilRt.ketua_nama} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 flex-shrink-0">
+                <Home className="w-12 h-12 text-white" />
+              </div>
+            )}
+            <div>
+              <span className="inline-block bg-white/20 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider mb-3 backdrop-blur-sm border border-white/10">
+                Dashboard RT
+              </span>
+              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-2" style={{ fontFamily: "var(--font-bitter)" }}>
+                RT {noRt}
+              </h1>
+              <p className="text-white/90 text-lg font-medium max-w-2xl">
+                {profilRt?.sambutan || `Dashboard informasi lengkap warga dan keuangan RT ${noRt} RW 10 Desa Cicadas.`}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Main Content ─────────────────── */}
+      <div className="container mx-auto px-4 max-w-6xl py-10 md:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* Left Column: Charts + Kas */}
+          <div className="lg:col-span-2">
+            <RtCharts
+              genderData={genderData}
+              ageData={ageData}
+              totalWarga={totalWarga}
+              totalKK={totalKK}
+              kasSummary={kasSummary}
+            />
+          </div>
+
+          {/* Right Column: Profil & Agenda */}
+          <div className="space-y-6">
+
+            {/* Profil RT Card */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+              <div className={`bg-gradient-to-r ${gradient} p-5`}>
+                <h3 className="text-sm font-black uppercase text-white tracking-wider" style={{ fontFamily: "var(--font-bitter)" }}>
+                  Profil RT {noRt}
+                </h3>
+              </div>
+              <div className="p-5 space-y-4">
+                {profilRt ? (
+                  <>
+                    {profilRt.ketua_foto_url && (
+                      <div className="flex justify-center">
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                          <img src={profilRt.ketua_foto_url} alt={profilRt.ketua_nama} className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <p className="font-black text-lg text-slate-800">{profilRt.ketua_nama}</p>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Ketua RT {noRt}</p>
+                    </div>
+                    {profilRt.visi_misi && (
+                      <blockquote className="text-sm italic text-slate-600 leading-relaxed border-l-2 border-primary/30 pl-3">
+                        &ldquo;{profilRt.visi_misi}&rdquo;
+                      </blockquote>
+                    )}
+                    {profilRt.kontak && (
+                      <a href={`https://wa.me/${profilRt.kontak.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-100 transition-colors border border-emerald-200">
+                        <Phone className="w-4 h-4" /> Hubungi via WhatsApp
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 font-medium">Profil RT belum diisi oleh admin.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Ringkasan Cepat */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+              <div className="bg-slate-800 p-5">
+                <h3 className="text-sm font-black uppercase text-white tracking-wider" style={{ fontFamily: "var(--font-bitter)" }}>
+                  Ringkasan RT {noRt}
+                </h3>
+              </div>
+              <div className="p-4 space-y-3">
+                {[
+                  { label: "Total Warga", value: `${totalWarga} jiwa`, icon: Users, color: "bg-sky-50 text-sky-600" },
+                  { label: "Kepala Keluarga", value: `${totalKK} KK`, icon: Home, color: "bg-violet-50 text-violet-600" },
+                  { label: "Laki-laki", value: `${countLaki} jiwa`, icon: Users, color: "bg-blue-50 text-blue-600" },
+                  { label: "Perempuan", value: `${countPerempuan} jiwa`, icon: Users, color: "bg-pink-50 text-pink-600" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div className={`p-2 rounded-xl ${item.color}`}>
+                      <item.icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-slate-500 font-medium">{item.label}</div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-sm text-slate-800">{item.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Agenda RT */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+              <div className="bg-primary p-5">
+                <h3 className="text-sm font-black uppercase text-white tracking-wider" style={{ fontFamily: "var(--font-bitter)" }}>
+                  Agenda RT {noRt}
+                </h3>
+              </div>
+              <div className="p-4">
+                {!kegiatanData || kegiatanData.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 font-medium">Belum ada agenda kegiatan.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {kegiatanData.slice(0, 5).map((k) => (
+                      <div key={k.id} className="flex items-start gap-3 p-3 border border-slate-100 rounded-xl hover:border-primary/30 transition-colors">
+                        <div className="text-center bg-primary/5 rounded-lg px-2.5 py-1.5 border border-primary/10 flex-shrink-0 min-w-[50px]">
+                          <p className="text-[10px] font-bold uppercase text-primary/70">{new Date(k.tanggal).toLocaleDateString("id-ID", { month: "short" })}</p>
+                          <p className="text-lg font-black text-primary leading-none">{new Date(k.tanggal).getDate()}</p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm text-slate-800 truncate">{k.judul}</p>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                            <Clock className="w-3 h-3" />
+                            {new Date(k.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                          </div>
+                          {k.lokasi && (
+                            <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+                              <MapPin className="w-3 h-3" />
+                              {k.lokasi}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

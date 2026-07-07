@@ -36,6 +36,7 @@ const mainNavLinks = [
 ];
 
 const dropdownLinks = [
+  { href: "/rt", label: "Wilayah RT (Dashboard)" },
   { href: "/laporan", label: "Lapor Infrastruktur" },
   { href: "/fasilitas", label: "Fasilitas" },
   { href: "/galeri", label: "Galeri Warga" },

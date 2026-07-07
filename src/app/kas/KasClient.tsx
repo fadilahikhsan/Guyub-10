@@ -11,9 +11,12 @@ interface KasData {
   kategori: string;
   jumlah: number;
   jenis: string;
+  entitas_type?: string;
+  entitas_id?: string;
 }
 
 export default function KasClient({ initialData }: { initialData: KasData[] }) {
+  const [selectedEntitas, setSelectedEntitas] = useState<string>("RW"); // Default RW, or 'SEMUA'
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
 
@@ -38,21 +41,36 @@ export default function KasClient({ initialData }: { initialData: KasData[] }) {
     { value: "12", label: "Desember" }
   ];
 
+  // Filter data by entitas first
+  const dataByEntitas = useMemo(() => {
+    if (selectedEntitas === "SEMUA") return initialData;
+    return initialData.filter(kas => {
+      if (selectedEntitas === "RW") return kas.entitas_type === "RW" || !kas.entitas_type; // Fallback for old data
+      if (selectedEntitas.startsWith("RT-")) {
+        return kas.entitas_type === "RT" && kas.entitas_id === selectedEntitas.split("-")[1];
+      }
+      if (selectedEntitas.startsWith("LEMBAGA-")) {
+        return kas.entitas_type === "Lembaga" && kas.entitas_id === selectedEntitas.split("-")[1];
+      }
+      return true;
+    });
+  }, [initialData, selectedEntitas]);
+
   // Calculate totals
   let totalSaldo = 0;
-  initialData.forEach(k => {
+  dataByEntitas.forEach(k => {
     if (k.jenis === 'masuk') totalSaldo += Number(k.jumlah);
     else totalSaldo -= Number(k.jumlah);
   });
 
   const filteredData = useMemo(() => {
-    return initialData.filter(kas => {
+    return dataByEntitas.filter(kas => {
       const kasDate = new Date(kas.tanggal);
       const matchesYear = kasDate.getFullYear().toString() === selectedYear;
       const matchesMonth = selectedMonth === "0" || (kasDate.getMonth() + 1).toString() === selectedMonth;
       return matchesYear && matchesMonth;
     });
-  }, [initialData, selectedYear, selectedMonth]);
+  }, [dataByEntitas, selectedYear, selectedMonth]);
 
   let totalMasukFilter = 0;
   let totalKeluarFilter = 0;
@@ -100,7 +118,7 @@ export default function KasClient({ initialData }: { initialData: KasData[] }) {
           <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
             <Activity className="w-6 h-6" />
           </div>
-          <p className="text-sm font-bold text-muted-foreground uppercase mb-1">Total Saldo Kas (Keseluruhan)</p>
+          <p className="text-sm font-bold text-muted-foreground uppercase mb-1">Total Saldo Kas {selectedEntitas === "RW" ? "RW Utama" : (selectedEntitas === "SEMUA" ? "Keseluruhan" : selectedEntitas)}</p>
           <p className="text-3xl font-black text-foreground">Rp {totalSaldo.toLocaleString("id-ID")}</p>
         </div>
 
@@ -108,7 +126,28 @@ export default function KasClient({ initialData }: { initialData: KasData[] }) {
           <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground mb-1">
             <Filter className="w-4 h-4" /> Filter Laporan
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={selectedEntitas}
+              onChange={(e) => setSelectedEntitas(e.target.value)}
+              className="px-4 py-2.5 rounded-xl border border-border bg-card font-medium text-foreground focus:ring-1 focus:ring-primary outline-none"
+            >
+              <option value="SEMUA">Semua Entitas</option>
+              <option value="RW">Kas RW Utama</option>
+              <option disabled>── KAS RT ──</option>
+              <option value="RT-01">RT 01</option>
+              <option value="RT-02">RT 02</option>
+              <option value="RT-03">RT 03</option>
+              <option value="RT-04">RT 04</option>
+              <option value="RT-05">RT 05</option>
+              <option value="RT-06">RT 06</option>
+              <option value="RT-07">RT 07</option>
+              <option value="RT-08">RT 08</option>
+              <option disabled>── KAS LEMBAGA ──</option>
+              <option value="LEMBAGA-pkk">PKK</option>
+              <option value="LEMBAGA-karang-taruna">Karang Taruna</option>
+              <option value="LEMBAGA-posyandu">Posyandu</option>
+            </select>
             <select 
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}

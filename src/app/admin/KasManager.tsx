@@ -61,7 +61,19 @@ export function KasManager({ kasList }: { kasList: any[] }) {
         <label className="text-xs font-bold">Kategori</label>
         <input type="text" name="kategori" defaultValue={data?.kategori || 'Iuran Warga'} required className="w-full p-2.5 rounded-lg border border-zinc-300 text-sm" />
       </div>
-      <div className="md:col-span-4 space-y-1">
+      <div className="space-y-1">
+        <label className="text-xs font-bold">Milik Entitas</label>
+        <select name="entitas_type" defaultValue={data?.entitas_type || 'RW'} required className="w-full p-2.5 rounded-lg border border-zinc-300 text-sm font-bold">
+          <option value="RW">Kas RW Utama</option>
+          <option value="RT">Kas RT Khusus</option>
+          <option value="Lembaga">Kas Lembaga Khusus</option>
+        </select>
+      </div>
+      <div className="space-y-1">
+        <label className="text-xs font-bold">ID Entitas (Jika RT/Lembaga)</label>
+        <input type="text" name="entitas_id" defaultValue={data?.entitas_id || 'RW'} required placeholder="Contoh: 01, PKK, RW" className="w-full p-2.5 rounded-lg border border-zinc-300 text-sm" />
+      </div>
+      <div className="md:col-span-2 space-y-1">
         <label className="text-xs font-bold">Keterangan / Uraian</label>
         <input type="text" name="keterangan" defaultValue={data?.keterangan} required placeholder="Contoh: Iuran kebersihan RT 01 bulan Mei" className="w-full p-2.5 rounded-lg border border-zinc-300 text-sm" />
       </div>
@@ -133,6 +145,7 @@ export function KasManager({ kasList }: { kasList: any[] }) {
                 <th className="px-4 py-3">Tanggal</th>
                 <th className="px-4 py-3">Uraian</th>
                 <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3">Milik</th>
                 <th className="px-4 py-3 text-right">Pemasukan</th>
                 <th className="px-4 py-3 text-right">Pengeluaran</th>
                 <th className="px-4 py-3 text-center">Aksi</th>
@@ -160,6 +173,9 @@ export function KasManager({ kasList }: { kasList: any[] }) {
                       <td className="px-4 py-3 font-medium whitespace-nowrap">{new Date(k.tanggal).toLocaleDateString('id-ID')}</td>
                       <td className="px-4 py-3 font-medium">{k.keterangan}</td>
                       <td className="px-4 py-3"><span className="bg-zinc-100 px-2 py-1 rounded text-xs text-zinc-600 font-medium uppercase">{k.kategori}</span></td>
+                      <td className="px-4 py-3">
+                        <span className="bg-blue-100 px-2 py-1 rounded text-xs text-blue-700 font-bold uppercase">{k.entitas_type} {k.entitas_id !== 'RW' ? k.entitas_id : ''}</span>
+                      </td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600">
                         {k.jenis === 'masuk' ? formatRp(k.jumlah) : '-'}
                       </td>

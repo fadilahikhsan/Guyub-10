@@ -12,6 +12,8 @@ interface Kegiatan {
   lokasi: string;
   kategori: string;
   penyelenggara?: string;
+  penyelenggara_type?: string;
+  penyelenggara_id?: string;
   foto_url?: string;
 }
 
@@ -184,7 +186,7 @@ export default function KegiatanManager({ data }: { data: Kegiatan[] }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1">Penyelenggara</label>
+                    <label className="block text-sm font-semibold mb-1">Nama Penyelenggara</label>
                     <select
                       name="penyelenggara"
                       defaultValue={editingData?.penyelenggara || "Pengurus RW"}
@@ -195,10 +197,34 @@ export default function KegiatanManager({ data }: { data: Kegiatan[] }) {
                       <option value="RT 02">RT 02</option>
                       <option value="RT 03">RT 03</option>
                       <option value="RT 04">RT 04</option>
-                      <option value="Karang Taruna">Karang Taruna (Pokja 10)</option>
+                      <option value="Karang Taruna">Karang Taruna</option>
                       <option value="PKK">PKK</option>
                       <option value="Posyandu">Posyandu</option>
                     </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">Tipe Entitas</label>
+                    <select
+                      name="penyelenggara_type"
+                      defaultValue={editingData?.penyelenggara_type || "RW"}
+                      className="w-full border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
+                    >
+                      <option value="RW">RW (Umum)</option>
+                      <option value="RT">RT</option>
+                      <option value="Lembaga">Lembaga</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">ID Entitas</label>
+                    <input
+                      name="penyelenggara_id"
+                      defaultValue={editingData?.penyelenggara_id || "RW"}
+                      placeholder="Contoh: 01, PKK, RW"
+                      className="w-full border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
                   </div>
                 </div>
 
