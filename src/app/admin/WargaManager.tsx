@@ -74,6 +74,17 @@ export function WargaManager({ wargaList }: { wargaList: any[] }) {
             return val.toISOString().split('T')[0];
           }
           const s = String(val).trim();
+          
+          // Handle Excel serial date (e.g. "34575")
+          if (/^\d+$/.test(s) && s.length >= 4 && s.length <= 5) {
+            const serial = parseInt(s, 10);
+            if (serial > 10000 && serial < 80000) { // roughly 1927 to 2119
+              // Excel offset to JS epoch (Jan 1 1970) is 25569 days
+              const jsDate = new Date((serial - 25569) * 86400 * 1000);
+              return jsDate.toISOString().split('T')[0];
+            }
+          }
+          
           // Match standard YYYY-MM-DD
           if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
           
