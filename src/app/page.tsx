@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
   FileText,
   Store,
@@ -17,8 +19,11 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
-import WidgetBar from "@/components/WidgetBar";
-import { InfografisWarga } from "@/components/InfografisWarga";
+
+const WidgetBar = dynamic(() => import("@/components/WidgetBar"), { ssr: false });
+const InfografisWarga = dynamic(() => import("@/components/InfografisWarga").then(mod => mod.InfografisWarga), { 
+  loading: () => <div className="h-[400px] w-full flex items-center justify-center text-muted-foreground">Memuat Statistik...</div> 
+});
 
 export const revalidate = 60;
 
@@ -149,10 +154,16 @@ export default async function Home() {
       <section className="relative w-full min-h-[80vh] md:min-h-[90vh] flex flex-col justify-end fade-in-up">
         {/* Background Layer */}
         {heroBg ? (
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${heroBg}')` }}
-          />
+          <div className="absolute inset-0">
+            <Image 
+              src={heroBg} 
+              alt="Hero Background" 
+              fill 
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+          </div>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-emerald-800 to-highlight geo-pattern" />
         )}
@@ -232,8 +243,14 @@ export default async function Home() {
               return (
               <article key={article.id} className="bg-card rounded-2xl overflow-hidden shadow-sm card-hover border border-border/60 fade-in-up flex flex-col">
                 {article.foto_url && (
-                  <Link href="/informasi" className="block aspect-[16/9] w-full overflow-hidden border-b border-border/50">
-                    <img src={article.foto_url} alt={article.judul} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                  <Link href="/informasi" className="block aspect-[16/9] w-full overflow-hidden border-b border-border/50 relative">
+                    <Image 
+                      src={article.foto_url} 
+                      alt={article.judul} 
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover hover:scale-105 transition-transform duration-300" 
+                    />
                   </Link>
                 )}
                 <div className="p-5 flex-1 flex flex-col">
@@ -363,9 +380,9 @@ export default async function Home() {
                 </div>
                 <div className="p-5 text-center">
                   <div className="relative inline-block mb-4">
-                    <div className="w-24 h-24 bg-muted rounded-full border-4 border-white shadow-lg overflow-hidden">
+                    <div className="w-24 h-24 bg-muted rounded-full border-4 border-white shadow-lg overflow-hidden relative">
                       {profilRw.ketua_foto_url ? (
-                        <img src={profilRw.ketua_foto_url} alt="Ketua RW" className="w-full h-full object-cover" />
+                        <Image src={profilRw.ketua_foto_url} alt="Ketua RW" fill sizes="96px" className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary"><Users className="w-8 h-8"/></div>
                       )}
@@ -424,7 +441,7 @@ export default async function Home() {
                   {umkmList.map(u => (
                     <Link key={u.id} href="/umkm" className="group block aspect-square rounded-xl overflow-hidden bg-muted relative border border-border/50">
                       {u.foto_url ? (
-                        <img src={u.foto_url} alt={u.nama_usaha} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                        <Image src={u.foto_url} alt={u.nama_usaha} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-110 transition-transform" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground/30"><Store className="w-8 h-8"/></div>
                       )}
