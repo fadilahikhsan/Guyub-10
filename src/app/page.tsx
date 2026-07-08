@@ -38,14 +38,16 @@ export default async function Home() {
     { data: tickerList },
     { data: kegiatanList },
     { data: umkmList },
-    { data: wargaData }
+    { data: wargaData },
+    { data: galeriList },
   ] = await Promise.all([
     supabase.from("pengumuman").select("id, judul, konten, kategori, foto_url, created_at").order("created_at", { ascending: false }).limit(5),
     supabase.from("profil_rw").select("*").limit(1).single(),
     supabase.from("ticker").select("*").eq("aktif", true).order("urutan", { ascending: true }),
     supabase.from("kegiatan").select("*").gte("tanggal", new Date().toISOString()).order("tanggal", { ascending: true }).limit(3),
     supabase.from("umkm").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(4),
-    adminSupabase.from("warga").select("rt, jenis_kelamin, tanggal_lahir, no_kk")
+    adminSupabase.from("warga").select("rt, jenis_kelamin, tanggal_lahir, no_kk"),
+    supabase.from("galeri").select("id, judul, foto_url").order("created_at", { ascending: false }).limit(6),
   ]);
 
   const stats = [
@@ -324,62 +326,43 @@ export default async function Home() {
               </section>
             )}
 
-            {/* Quick Access Widget (Layanan Warga) moved to Left Column on Desktop for better flow or keep it right? PRD says "Sisa section lain ... TETAP seperti urutan di PRD". I will put it in right column. */}
-
-            {/* ── Statistik Ringkas Warga (Desktop Only filler) ── */}
+            {/* ── Galeri Preview (Desktop Only filler) ── */}
             <section className="hidden lg:block">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-1.5 h-7 bg-primary rounded-full" />
-                <h2 className="text-xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
-                  Statistik Warga
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-5">
-                {stats.map((s) => (
-                  <div key={s.label} className={`${s.bg} rounded-2xl p-5 border border-border/40 flex items-center gap-4 shadow-sm`}>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.bg} border border-current/10`}>
-                      <s.icon className={`w-6 h-6 ${s.color}`} />
-                    </div>
-                    <div>
-                      <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">{s.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* ── UMKM Spotlight (Desktop Only filler) ── */}
-            {umkmList && umkmList.length > 0 && (
-              <section className="hidden lg:block">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-7 bg-highlight rounded-full" />
-                    <h2 className="text-xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
-                      UMKM Warga
-                    </h2>
-                  </div>
-                  <Link href="/umkm" className="text-sm font-bold text-accent hover:text-accent/80 flex items-center gap-1 transition-colors group">
-                    Lihat Semua <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-7 bg-primary rounded-full" />
+                  <h2 className="text-xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
+                    Galeri Warga
+                  </h2>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {umkmList.slice(0, 4).map((u) => (
-                    <Link key={u.id} href="/umkm" className="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:border-highlight/40 hover:shadow-md transition-all group">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-highlight/10 flex items-center justify-center flex-shrink-0 group-hover:bg-highlight/20 transition-colors">
-                          <Store className="w-5 h-5 text-highlight" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-sm text-foreground line-clamp-1 group-hover:text-accent transition-colors">{u.nama_usaha}</p>
-                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{u.kategori}</p>
-                        </div>
-                      </div>
+                <Link href="/galeri" className="text-sm font-bold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors group">
+                  Semua Foto <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+              {galeriList && galeriList.length > 0 ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {galeriList.map((g) => (
+                    <Link key={g.id} href="/galeri" className="group block aspect-square rounded-2xl overflow-hidden relative border border-border/60 shadow-sm">
+                      <Image
+                        src={g.foto_url}
+                        alt={g.judul || "Foto Galeri"}
+                        fill
+                        sizes="200px"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <p className="absolute bottom-2 left-2 right-2 text-white text-[10px] font-bold line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity">{g.judul}</p>
                     </Link>
                   ))}
                 </div>
-              </section>
-            )}
+              ) : (
+                <Link href="/galeri" className="block rounded-2xl border-2 border-dashed border-border p-10 text-center hover:border-primary/40 transition-colors group">
+                  <div className="text-4xl mb-3">📸</div>
+                  <p className="font-bold text-muted-foreground group-hover:text-primary transition-colors">Belum ada foto galeri</p>
+                  <p className="text-xs text-muted-foreground mt-1">Tambahkan melalui Admin Panel</p>
+                </Link>
+              )}
+            </section>
 
           </div>
 
