@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { logout } from "@/app/login/actions";
 import {
-  MountainIcon,
   Menu,
   X,
   Search,
@@ -183,30 +182,28 @@ export default function NavbarClient({ user, role = "user", announcements = [] }
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
               <div
-                className={`${isHomeTop ? "bg-white/20 backdrop-blur" : "bg-primary"} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:rotate-3 ${
-                  scrolled ? "w-9 h-9" : "w-12 h-12"
-                } ${!isHomeTop && "group-hover:bg-primary/90"}`}
+                className={`relative flex items-center justify-center transition-all duration-300 group-hover:scale-105 ${
+                  scrolled ? "w-10 h-10" : "w-14 h-14"
+                }`}
               >
-                <MountainIcon
-                  className={`text-white transition-all duration-300 ${
-                    scrolled ? "h-5 w-5" : "h-7 w-7"
-                  }`}
+                <img 
+                  src="/logo-rw.png" 
+                  alt="Logo RW"
+                  className="w-full h-full object-contain drop-shadow-md"
                 />
               </div>
-              <div>
+              <div className="flex flex-col">
                 <span
                   className={`block font-black tracking-tight transition-all duration-300 leading-none ${
-                    scrolled ? "text-2xl" : "text-3xl"
+                    scrolled ? "text-xl" : "text-2xl"
                   } ${isHomeTop ? "text-white" : "text-foreground"}`}
                   style={{ fontFamily: "var(--font-bitter)" }}
                 >
-                  Guyub<span className={isHomeTop ? "text-highlight" : "text-primary"}>.</span>
+                  RW 10
                 </span>
-                {!scrolled && (
-                  <span className={`block text-xs font-semibold uppercase tracking-widest mt-0.5 ${isHomeTop ? "text-white/80" : "text-muted-foreground"}`}>
-                    Portal Informasi RW 10
-                  </span>
-                )}
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${isHomeTop ? "text-white/80" : "text-slate-500"}`}>
+                  Desa Cicadas
+                </span>
               </div>
             </Link>
 

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  MountainIcon,
   MapPin,
   Phone,
   Mail,
@@ -42,19 +41,19 @@ export default async function Footer() {
 
           {/* Col 1: Brand + Social — 5 col */}
           <div className="md:col-span-5">
-            <Link href="/" className="flex items-center space-x-3 mb-5 group">
-              <div className="bg-primary p-2.5 rounded-xl group-hover:bg-primary/90 transition-colors">
-                <MountainIcon className="h-6 w-6 text-white" />
+            <Link href="/" className="flex items-center space-x-4 mb-6 group">
+              <div className="w-16 h-16 bg-white/5 rounded-2xl p-2 group-hover:bg-white/10 transition-colors flex items-center justify-center">
+                <img src="/logo-rw.png" alt="Logo RW 10" className="w-full h-full object-contain" />
               </div>
               <div>
                 <span
-                  className="block text-2xl font-black text-white"
+                  className="block text-2xl font-black text-white tracking-tight leading-none group-hover:text-primary transition-colors"
                   style={{ fontFamily: "var(--font-bitter)" }}
                 >
-                  Guyub<span className="text-amber-400">.</span>
+                  RW 10
                 </span>
-                <span className="text-xs text-slate-500 uppercase tracking-widest font-semibold">
-                  Portal Resmi RW 10
+                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                  Desa Cicadas
                 </span>
               </div>
             </Link>
