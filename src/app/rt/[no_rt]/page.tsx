@@ -26,6 +26,9 @@ export default async function RtDashboardPage({ params }: { params: Promise<{ no
     .eq("no_rt", noRt)
     .single();
 
+  // Database warga formatnya '001', '002', jadi kita perlu padStart
+  const dbRt = noRt.padStart(3, '0');
+
   // Ambil semua data secara paralel
   const [
     { data: wargaData },
@@ -33,8 +36,8 @@ export default async function RtDashboardPage({ params }: { params: Promise<{ no
     { data: kasData },
     { data: kegiatanData },
   ] = await Promise.all([
-    adminSupabase.from("warga").select("jenis_kelamin, tanggal_lahir, no_kk").eq("rt", noRt),
-    adminSupabase.from("warga").select("id, nama_lengkap, nik, jenis_kelamin, tanggal_lahir, pekerjaan, status_perkawinan, no_kk, status_warga").eq("rt", noRt).order("nama_lengkap", { ascending: true }),
+    adminSupabase.from("warga").select("jenis_kelamin, tanggal_lahir, no_kk").eq("rt", dbRt),
+    adminSupabase.from("warga").select("id, nama_lengkap, nik, jenis_kelamin, tanggal_lahir, pekerjaan, status_perkawinan, no_kk, status_warga").eq("rt", dbRt).order("nama_lengkap", { ascending: true }),
     supabase.from("kas").select("*").eq("entitas_type", "RT").eq("entitas_id", noRt).order("tanggal", { ascending: false }),
     supabase.from("kegiatan").select("*").eq("penyelenggara_type", "RT").eq("penyelenggara_id", noRt).order("tanggal", { ascending: true }),
   ]);
