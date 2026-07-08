@@ -187,9 +187,9 @@ export default function NavbarClient({ user, role = "user", announcements = [] }
                 }`}
               >
                 <img 
-                  src="/logo-rw.png" 
+                  src="/logo-rw.jpg" 
                   alt="Logo RW"
-                  className="w-full h-full object-contain drop-shadow-md"
+                  className="w-full h-full object-contain drop-shadow-md rounded-full"
                 />
               </div>
               <div className="flex flex-col">
@@ -199,10 +199,10 @@ export default function NavbarClient({ user, role = "user", announcements = [] }
                   } ${isHomeTop ? "text-white" : "text-foreground"}`}
                   style={{ fontFamily: "var(--font-bitter)" }}
                 >
-                  RW 10
+                  GUYUB 10
                 </span>
                 <span className={`text-[10px] font-bold uppercase tracking-wider ${isHomeTop ? "text-white/80" : "text-slate-500"}`}>
-                  Desa Cicadas
+                  Portal Resmi RW 10 Desa Cicadas
                 </span>
               </div>
             </Link>
