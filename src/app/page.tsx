@@ -326,6 +326,61 @@ export default async function Home() {
 
             {/* Quick Access Widget (Layanan Warga) moved to Left Column on Desktop for better flow or keep it right? PRD says "Sisa section lain ... TETAP seperti urutan di PRD". I will put it in right column. */}
 
+            {/* ── Statistik Ringkas Warga (Desktop Only filler) ── */}
+            <section className="hidden lg:block">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-1.5 h-7 bg-primary rounded-full" />
+                <h2 className="text-xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
+                  Statistik Warga
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mb-5">
+                {stats.map((s) => (
+                  <div key={s.label} className={`${s.bg} rounded-2xl p-5 border border-border/40 flex items-center gap-4 shadow-sm`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.bg} border border-current/10`}>
+                      <s.icon className={`w-6 h-6 ${s.color}`} />
+                    </div>
+                    <div>
+                      <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wide">{s.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── UMKM Spotlight (Desktop Only filler) ── */}
+            {umkmList && umkmList.length > 0 && (
+              <section className="hidden lg:block">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-7 bg-highlight rounded-full" />
+                    <h2 className="text-xl font-black text-foreground uppercase tracking-tight" style={{ fontFamily: "var(--font-bitter)" }}>
+                      UMKM Warga
+                    </h2>
+                  </div>
+                  <Link href="/umkm" className="text-sm font-bold text-accent hover:text-accent/80 flex items-center gap-1 transition-colors group">
+                    Lihat Semua <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {umkmList.slice(0, 4).map((u) => (
+                    <Link key={u.id} href="/umkm" className="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:border-highlight/40 hover:shadow-md transition-all group">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-highlight/10 flex items-center justify-center flex-shrink-0 group-hover:bg-highlight/20 transition-colors">
+                          <Store className="w-5 h-5 text-highlight" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm text-foreground line-clamp-1 group-hover:text-accent transition-colors">{u.nama_usaha}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{u.kategori}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
           </div>
 
           {/* ── Right Column (Sidebar) ────────────────── */}
