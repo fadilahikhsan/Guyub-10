@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { fetchAllWarga } from "@/lib/supabase/fetchAllWarga";
 
 const WidgetBar = dynamic(() => import("@/components/WidgetBar"));
 const InfografisWarga = dynamic(() => import("@/components/InfografisWarga").then(mod => mod.InfografisWarga), { 
@@ -38,16 +38,16 @@ export default async function Home() {
     { data: tickerList },
     { data: kegiatanList },
     { data: umkmList },
-    { data: wargaData },
     { data: galeriList },
+    wargaData
   ] = await Promise.all([
     supabase.from("pengumuman").select("id, judul, konten, kategori, foto_url, created_at").order("created_at", { ascending: false }).limit(5),
     supabase.from("profil_rw").select("*").limit(1).single(),
     supabase.from("ticker").select("*").eq("aktif", true).order("urutan", { ascending: true }),
     supabase.from("kegiatan").select("*").gte("tanggal", new Date().toISOString()).order("tanggal", { ascending: true }).limit(3),
     supabase.from("umkm").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(4),
-    adminSupabase.from("warga").select("rt, jenis_kelamin, tanggal_lahir, no_kk"),
     supabase.from("galeri").select("id, judul, foto_url").order("created_at", { ascending: false }).limit(6),
+    fetchAllWarga("rt, jenis_kelamin, tanggal_lahir, no_kk")
   ]);
 
   const stats = [

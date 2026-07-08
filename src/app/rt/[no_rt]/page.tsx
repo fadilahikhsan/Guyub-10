@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fetchAllWarga } from "@/lib/supabase/fetchAllWarga";
 import { ChevronRight, Home, Users, Phone, MapPin, Calendar, Clock } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -31,16 +32,19 @@ export default async function RtDashboardPage({ params }: { params: Promise<{ no
 
   // Ambil semua data secara paralel
   const [
-    { data: wargaData },
-    { data: wargaFullData },
+    wargaData,
+    wargaFullDataRaw,
     { data: kasData },
     { data: kegiatanData },
   ] = await Promise.all([
-    adminSupabase.from("warga").select("jenis_kelamin, tanggal_lahir, no_kk").eq("rt", dbRt),
-    adminSupabase.from("warga").select("id, nama_lengkap, nik, jenis_kelamin, tanggal_lahir, pekerjaan, status_perkawinan, no_kk, status_warga").eq("rt", dbRt).order("nama_lengkap", { ascending: true }),
+    fetchAllWarga("rt, jenis_kelamin, tanggal_lahir, no_kk", dbRt),
+    fetchAllWarga("id, nama_lengkap, nik, jenis_kelamin, tanggal_lahir, pekerjaan, status_perkawinan, no_kk, status_warga", dbRt),
     supabase.from("kas").select("*").eq("entitas_type", "RT").eq("entitas_id", noRt).order("tanggal", { ascending: false }),
     supabase.from("kegiatan").select("*").eq("penyelenggara_type", "RT").eq("penyelenggara_id", noRt).order("tanggal", { ascending: true }),
   ]);
+  
+  // Sort the full data client side since fetchAllWarga doesn't sort by nama_lengkap
+  const wargaFullData = (wargaFullDataRaw as any[]).sort((a, b) => (a.nama_lengkap || "").localeCompare(b.nama_lengkap || ""));
 
   // ── Hitung statistik warga ──
   const totalWarga = wargaData?.length || 0;
