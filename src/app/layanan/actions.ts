@@ -6,12 +6,8 @@ import { revalidatePath } from "next/cache";
 export async function submitSurat(formData: FormData) {
   const supabase = await createClient();
 
-  // Memastikan pengguna sudah login
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { error: "Anda harus login untuk mengajukan surat." };
-  }
+  // Fitur cetak mandiri tidak memerlukan login.
+  // Surat dicetak sendiri oleh warga dan disahkan langsung (fisik) ke RT/RW.
 
   // Mengambil data dari form
   const jenis = formData.get("jenis") as string;
@@ -20,52 +16,57 @@ export async function submitSurat(formData: FormData) {
   const tujuan = formData.get("tujuan") as string;
   const lampiran = formData.get("lampiran") as File | null;
 
-  if (!jenis || !keperluan || !tujuan || !lampiran || lampiran.size === 0) {
-    return { error: "Jenis surat, tujuan, keperluan, dan lampiran wajib diisi." };
+  if (!jenis || !keperluan || !tujuan) {
+    return { error: "Jenis surat, tujuan, dan keperluan wajib diisi." };
   }
 
-  // Upload lampiran ke Supabase Storage
-  const fileExt = lampiran.name.split('.').pop();
-  const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-  
-  const { error: uploadError } = await supabase.storage
-    .from("surat_lampiran")
-    .upload(fileName, lampiran);
-
-  if (uploadError) {
-    console.error("Gagal mengunggah lampiran:", uploadError);
-    return { error: "Gagal mengunggah lampiran dokumen." };
+  let lampiranUrl = null;
+  // Upload lampiran ke Supabase Storage if it exists
+  if (lampiran && lampiran.size > 0) {
+    const fileExt = lampiran.name.split('.').pop();
+    // Note: Kita tidak menyimpan lampiran karena warga cetak sendiri.
+    // Jika butuh penyimpanan, pastikan user_id nullable di database.
   }
-
-  const { data: publicUrlData } = supabase.storage
-    .from("surat_lampiran")
-    .getPublicUrl(fileName);
-    
-  const lampiranUrl = publicUrlData.publicUrl;
 
   // Generate Nomor Tiket
   const nomorTiket = `TKT-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
 
-  // Menyimpan ke database
-  const { error: insertError } = await supabase
-    .from("surat")
-    .insert({
-      user_id: user.id,
-      jenis_surat: jenis,
-      nik_pemohon: nik,
-      keperluan: keperluan,
-      lampiran_url: lampiranUrl,
-      tujuan: tujuan,
-      nomor_tiket: nomorTiket,
-    });
-
-  if (insertError) {
-    console.error("Gagal mengajukan surat:", insertError);
-    return { error: "Terjadi kesalahan pada sistem. Gagal mengajukan surat." };
-  }
+  // Karena ini adalah Cetak Mandiri, kita tidak perlu menyimpan 
+  // ke tabel 'surat' (karena user_id wajib di tabel tersebut, dan admin tidak perlu
+  // memproses secara digital, melainkan mengecap langsung kertas fisik).
+  
+  // Jika di masa depan ingin ada riwayat, kita perlu mengubah skema DB (membuat user_id nullable).
 
   revalidatePath("/admin");
   revalidatePath("/layanan");
 
   return { success: true, nomorTiket };
+}
+
+export async function getKetuaNames(rt: string) {
+  const supabase = await createClient();
+
+  // Get RW 10 Name
+  const { data: rwData } = await supabase
+    .from('profil_rw')
+    .select('ketua_nama')
+    .limit(1)
+    .single();
+
+  // Get RT Name
+  let rtData = null;
+  if (rt) {
+    const { data } = await supabase
+      .from('profil_rt')
+      .select('ketua_nama')
+      .eq('no_rt', rt.replace('RT ', ''))
+      .limit(1)
+      .single();
+    rtData = data;
+  }
+
+  return {
+    namaKetuaRw: rwData?.ketua_nama || '',
+    namaKetuaRt: rtData?.ketua_nama || '',
+  };
 }

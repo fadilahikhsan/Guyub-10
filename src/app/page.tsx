@@ -30,7 +30,6 @@ export const revalidate = 60;
 
 export default async function Home() {
   const supabase = await createClient();
-  const adminSupabase = createAdminClient();
 
   const [
     { data: articlesList },
@@ -47,7 +46,7 @@ export default async function Home() {
     supabase.from("kegiatan").select("*").gte("tanggal", new Date().toISOString()).order("tanggal", { ascending: true }).limit(3),
     supabase.from("umkm").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(4),
     supabase.from("galeri").select("id, judul, foto_url").order("created_at", { ascending: false }).limit(6),
-    fetchAllWarga("rt, jenis_kelamin, tanggal_lahir, no_kk")
+    fetchAllWarga("rt,jenis_kelamin,tanggal_lahir,no_kk")
   ]);
 
   const stats = [
@@ -106,7 +105,7 @@ export default async function Home() {
 
     // Age
     if (w.tanggal_lahir) {
-      const birthDate = new Date(w.tanggal_lahir);
+      const birthDate = new Date(w.tanggal_lahir as string);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();

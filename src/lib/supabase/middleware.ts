@@ -6,7 +6,7 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  // Cek apakah env variable Supabase sudah diisi
+  // 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     console.warn('Supabase URL atau Key belum disetel di .env. Melewati pengecekan sesi...');
     return supabaseResponse;

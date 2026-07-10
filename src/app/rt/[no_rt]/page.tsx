@@ -60,7 +60,7 @@ export default async function RtDashboardPage({ params }: { params: Promise<{ no
     else if (w.jenis_kelamin === 'P') countPerempuan++;
 
     if (w.tanggal_lahir) {
-      const birthDate = new Date(w.tanggal_lahir);
+      const birthDate = new Date(w.tanggal_lahir as string);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();

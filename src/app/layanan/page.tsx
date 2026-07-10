@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, FileText, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
-import { submitSurat } from "./actions";
+import { submitSurat, getKetuaNames } from "./actions";
+import { pdf } from '@react-pdf/renderer';
+import SuratPengantarPDF from '@/components/pdf/SuratPengantarPDF';
 
 type FormDataState = {
   jenis: string;
+  namaLengkap: string;
   nik: string;
   lampiran: File | null;
-  tujuan: string;
+  domisiliRt: string;
+  pilihanPengesahan: "rt_saja" | "rt_rw" | "";
   keperluan: string;
 };
 
@@ -22,11 +26,26 @@ export default function LayananSuratPage() {
   const [nomorTiket, setNomorTiket] = useState("");
   const [formData, setFormData] = useState<FormDataState>({
     jenis: "",
+    namaLengkap: "",
     nik: "",
     lampiran: null,
-    tujuan: "",
+    domisiliRt: "",
+    pilihanPengesahan: "",
     keperluan: "",
   });
+
+  // Fetch logo sebagai base64 agar bisa dipakai di PDF renderer
+  const [logoBase64, setLogoBase64] = useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    fetch('/logo-rw.png')
+      .then(res => res.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => setLogoBase64(reader.result as string);
+        reader.readAsDataURL(blob);
+      })
+      .catch(() => {/* logo optional */});
+  }, []);
 
   const updateField = (field: keyof FormDataState, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -41,18 +60,22 @@ export default function LayananSuratPage() {
       return;
     }
     if (step === 2) {
+      if (!formData.namaLengkap) {
+        setErrorMessage("Nama lengkap wajib diisi.");
+        return;
+      }
       if (!formData.nik || formData.nik.length !== 16) {
         setErrorMessage("NIK harus 16 digit angka.");
         return;
       }
-      if (!formData.lampiran) {
-        setErrorMessage("Upload dokumen KTP/KK terlebih dahulu.");
-        return;
-      }
     }
     if (step === 3) {
-      if (!formData.tujuan) {
-        setErrorMessage("Pilih tujuan pengajuan.");
+      if (!formData.domisiliRt) {
+        setErrorMessage("Pilih domisili RT.");
+        return;
+      }
+      if (!formData.pilihanPengesahan) {
+        setErrorMessage("Pilih jenis pengesahan.");
         return;
       }
       if (!formData.keperluan) {
@@ -74,26 +97,64 @@ export default function LayananSuratPage() {
     setIsSubmitting(true);
     setErrorMessage("");
 
-    const fd = new FormData();
-    fd.append("jenis", formData.jenis);
-    fd.append("nik", formData.nik);
-    if (formData.lampiran) fd.append("lampiran", formData.lampiran);
-    fd.append("tujuan", formData.tujuan);
-    fd.append("keperluan", formData.keperluan);
+    try {
+      // 1. Ambil nama ketua RT dan RW
+      const names = await getKetuaNames(formData.domisiliRt);
 
-    const result = await submitSurat(fd);
+      // 2. Buat PDF
+      const doc = <SuratPengantarPDF data={{
+        nama: formData.namaLengkap,
+        nik: formData.nik,
+        rt: formData.domisiliRt.replace('RT ', ''),
+        keperluan: formData.keperluan,
+        jenisSurat: formData.jenis,
+        tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        namaKetuaRt: names.namaKetuaRt,
+        namaKetuaRw: names.namaKetuaRw,
+        jenisPengesahan: formData.pilihanPengesahan as 'rt_saja' | 'rt_rw',
+        logoBase64,
+      }} />;
+      
+      const asPdf = pdf([]);
+      asPdf.updateContainer(doc);
+      const blob = await asPdf.toBlob();
+      const url = URL.createObjectURL(blob);
+      
+      // 3. Trigger download PDF
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Surat_Pengantar_${formData.namaLengkap.replace(/\s+/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-    if (result.error) {
-      setErrorMessage(result.error);
+      // 4. Simpan ke database
+      const fd = new FormData();
+      fd.append("jenis", formData.jenis);
+      fd.append("nik", formData.nik);
+      if (formData.lampiran) fd.append("lampiran", formData.lampiran);
+      fd.append("tujuan", formData.pilihanPengesahan === 'rt_rw' ? 'RW 10' : formData.domisiliRt);
+      fd.append("keperluan", formData.keperluan);
+
+      const result = await submitSurat(fd);
+
+      if (result.error) {
+        setErrorMessage(result.error);
+        setIsSubmitting(false);
+      } else {
+        setNomorTiket(result.nomorTiket || "TKT-0000");
+        setIsSuccess(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Gagal membuat PDF. Silakan coba lagi.");
       setIsSubmitting(false);
-    } else {
-      setNomorTiket(result.nomorTiket || "TKT-0000");
-      setIsSuccess(true);
     }
   };
 
   const jenisSurat = [
     "Pengantar KTP / KK",
+    "Pengantar SKCK",
     "Surat Keterangan Domisili",
     "Surat Keterangan Usaha (SKU)",
     "Surat Keterangan Tidak Mampu (SKTM)",
@@ -102,7 +163,8 @@ export default function LayananSuratPage() {
     "Surat Keterangan Kelahiran",
     "Surat Izin Keramaian",
     "Surat Keterangan Pindah",
-    "Surat Keterangan Belum Menikah"
+    "Surat Keterangan Belum Menikah",
+    "Surat Keterangan Ahli Waris",
   ];
 
   if (isSuccess) {
@@ -110,23 +172,13 @@ export default function LayananSuratPage() {
       <div className="flex flex-col min-h-[70vh] items-center justify-center p-4 bg-background">
         <div className="bg-white p-12 rounded-2xl border border-border max-w-lg w-full text-center shadow-lg">
           <CheckCircle2 className="w-24 h-24 text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-black tracking-tight mb-2" style={{ fontFamily: "var(--font-bitter)" }}>Pengajuan Berhasil!</h1>
-          <p className="text-lg text-muted-foreground font-medium mb-6">
-            Permintaan surat pengantar Anda telah masuk ke sistem.
+          <h1 className="text-3xl font-black tracking-tight mb-2" style={{ fontFamily: "var(--font-bitter)" }}>PDF Berhasil Diunduh!</h1>
+          <p className="text-muted-foreground font-medium mb-8">
+            Cetak file PDF tersebut, lalu bawa ke rumah Ketua RT untuk meminta <strong>tanda tangan dan stempel basah</strong>.
           </p>
-          <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200 mb-8 inline-block">
-            <p className="text-xs text-zinc-500 uppercase font-bold mb-1">Nomor Tiket Anda</p>
-            <p className="text-2xl font-black font-mono tracking-wider text-primary">{nomorTiket}</p>
-          </div>
-          <p className="text-sm text-zinc-500 mb-8">Simpan nomor tiket ini untuk mengecek status surat Anda.</p>
           <div className="flex flex-col gap-3">
-            <Link href="/layanan/cek">
-              <button className="bg-primary text-primary-foreground font-bold px-8 py-4 rounded-xl hover:bg-primary/90 transition-all w-full">
-                Cek Status Surat Sekarang
-              </button>
-            </Link>
             <Link href="/">
-              <button className="bg-muted text-foreground font-bold px-8 py-4 rounded-xl hover:bg-muted/80 transition-all w-full border border-border">
+              <button className="bg-primary text-primary-foreground font-bold px-8 py-4 rounded-xl hover:bg-primary/90 transition-all w-full">
                 Kembali ke Beranda
               </button>
             </Link>
@@ -225,6 +277,16 @@ export default function LayananSuratPage() {
                 <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-bitter)" }}>Verifikasi Identitas</h3>
                 <div className="space-y-4">
                   <div>
+                    <label className="block text-sm font-bold text-muted-foreground mb-2">Nama Lengkap *</label>
+                    <input 
+                      type="text" 
+                      value={formData.namaLengkap}
+                      onChange={(e) => updateField("namaLengkap", e.target.value)}
+                      placeholder="Nama Sesuai KTP"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium text-foreground"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-muted-foreground mb-2">Nomor Induk Kependudukan (NIK) *</label>
                     <input 
                       type="text" 
@@ -235,7 +297,7 @@ export default function LayananSuratPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-muted-foreground mb-2">Unggah Dokumen (KTP/KK) *</label>
+                    <label className="block text-sm font-bold text-muted-foreground mb-2">Unggah Dokumen (KTP/KK) (Opsional)</label>
                     <input 
                       type="file" 
                       accept="image/jpeg, image/png, application/pdf"
@@ -258,19 +320,32 @@ export default function LayananSuratPage() {
                 <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-bitter)" }}>Tujuan & Keperluan</h3>
                 
                 <div>
-                  <label className="block text-sm font-bold text-muted-foreground mb-2">Tujuan Pengajuan *</label>
+                  <label className="block text-sm font-bold text-muted-foreground mb-2">Domisili RT *</label>
                   <select 
-                    value={formData.tujuan}
-                    onChange={(e) => updateField("tujuan", e.target.value)}
+                    value={formData.domisiliRt}
+                    onChange={(e) => updateField("domisiliRt", e.target.value)}
                     required 
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium text-foreground"
                   >
-                    <option value="">Pilih Tujuan...</option>
-                    <option value="RW 10">Pengurus RW 10</option>
-                    <option value="RT 01">Pengurus RT 01</option>
-                    <option value="RT 02">Pengurus RT 02</option>
-                    <option value="RT 03">Pengurus RT 03</option>
-                    <option value="RT 04">Pengurus RT 04</option>
+                    <option value="">Pilih RT...</option>
+                    <option value="RT 01">RT 01</option>
+                    <option value="RT 02">RT 02</option>
+                    <option value="RT 03">RT 03</option>
+                    <option value="RT 04">RT 04</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-muted-foreground mb-2">Pilihan Pengesahan *</label>
+                  <select 
+                    value={formData.pilihanPengesahan}
+                    onChange={(e) => updateField("pilihanPengesahan", e.target.value as "rt_saja" | "rt_rw" | "")}
+                    required 
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium text-foreground"
+                  >
+                    <option value="">Pilih Tujuan Pengesahan...</option>
+                    <option value="rt_saja">Hanya Ke RT (Butuh 1 Tanda Tangan)</option>
+                    <option value="rt_rw">Ke Kelurahan via RW (Butuh Tanda Tangan RT & RW)</option>
                   </select>
                 </div>
 

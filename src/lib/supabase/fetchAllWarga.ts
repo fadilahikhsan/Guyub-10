@@ -1,6 +1,6 @@
 import { createAdminClient } from './admin';
 
-type WargaSelectFields = 'rt, jenis_kelamin, tanggal_lahir, no_kk' | 'id, nama_lengkap, nik, jenis_kelamin, tanggal_lahir, pekerjaan, status_perkawinan, no_kk, status_warga';
+type WargaSelectFields = 'rt,jenis_kelamin,tanggal_lahir,no_kk' | 'id,nama_lengkap,nik,jenis_kelamin,tanggal_lahir,pekerjaan,status_perkawinan,no_kk,status_warga';
 
 /**
  * Fetch semua data warga menggunakan pagination (batch 1000).
