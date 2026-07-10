@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Search, ShoppingBag, Wrench, Briefcase, MapPin, Store } from "lucide-react";
@@ -165,7 +165,7 @@ export default function ClientUmkmList({ initialData }: { initialData: Umkm[] })
               Daftarkan usaha Anda di Guyub secara gratis! Biar seluruh warga RW tahu dan jualan Anda makin laris.
             </p>
           </div>
-          <Link href="/login" className="w-full md:w-auto bg-highlight text-zinc-900 px-8 py-4 rounded-2xl font-black text-lg hover:scale-105 hover:bg-amber-400 transition-all shadow-xl relative z-10 text-center">
+          <Link href="/umkm/daftar" className="w-full md:w-auto bg-highlight text-zinc-900 px-8 py-4 rounded-2xl font-black text-lg hover:scale-105 hover:bg-amber-400 transition-all shadow-xl relative z-10 text-center">
             Daftarkan Usaha Saya
           </Link>
         </div>

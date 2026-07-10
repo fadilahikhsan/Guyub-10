@@ -107,9 +107,9 @@ export function UmkmManager({ umkmList }: { umkmList: any[] }) {
                   </div>
                 </td>
                 <td className="py-4 pr-4 text-zinc-600">
-                  <div className="font-bold text-zinc-800">{u.profiles?.nama_lengkap}</div>
+                  <div className="font-bold text-zinc-800">{u.profiles?.nama_lengkap || u.nama_pemilik || "Tanpa Nama"}</div>
                   <div className="flex items-center gap-1 text-xs text-zinc-500 mt-0.5">
-                    <MapPin className="w-3 h-3" /> RT {u.profiles?.rt}
+                    <MapPin className="w-3 h-3" /> RT {u.profiles?.rt || "-"}
                   </div>
                 </td>
                 <td className="py-4 pr-4">
