@@ -29,7 +29,7 @@ export async function fetchAllWarga(fields: WargaSelectFields, rtFilter?: string
     if (error || !data || data.length === 0) {
       hasMore = false;
     } else {
-      allData = [...allData, ...(data as Record<string, unknown>[])];
+      allData = [...allData, ...(data as unknown as Record<string, unknown>[])];
       from += PAGE_SIZE;
       // Kalau hasil < PAGE_SIZE, berarti sudah habis
       if ((data as unknown[]).length < PAGE_SIZE) hasMore = false;
