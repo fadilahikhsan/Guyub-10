@@ -115,9 +115,7 @@ export default function LayananSuratPage() {
         logoBase64,
       }} />;
       
-      const asPdf = pdf([]);
-      asPdf.updateContainer(doc);
-      const blob = await asPdf.toBlob();
+      const blob = await pdf(doc).toBlob();
       const url = URL.createObjectURL(blob);
       
       // 3. Trigger download PDF

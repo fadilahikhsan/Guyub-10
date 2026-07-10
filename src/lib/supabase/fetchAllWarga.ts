@@ -1,6 +1,6 @@
 import { createAdminClient } from './admin';
 
-type WargaSelectFields = 'rt,jenis_kelamin,tanggal_lahir,no_kk' | 'id,nama_lengkap,nik,jenis_kelamin,tanggal_lahir,pekerjaan,status_perkawinan,no_kk,status_warga';
+type WargaSelectFields = string;
 
 /**
  * Fetch semua data warga menggunakan pagination (batch 1000).
@@ -29,10 +29,10 @@ export async function fetchAllWarga(fields: WargaSelectFields, rtFilter?: string
     if (error || !data || data.length === 0) {
       hasMore = false;
     } else {
-      allData = [...allData, ...data];
+      allData = [...allData, ...(data as Record<string, unknown>[])];
       from += PAGE_SIZE;
       // Kalau hasil < PAGE_SIZE, berarti sudah habis
-      if (data.length < PAGE_SIZE) hasMore = false;
+      if ((data as unknown[]).length < PAGE_SIZE) hasMore = false;
     }
   }
 
