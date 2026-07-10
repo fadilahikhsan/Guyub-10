@@ -37,7 +37,7 @@ export default function LayananSuratPage() {
   // Fetch logo sebagai base64 agar bisa dipakai di PDF renderer
   const [logoBase64, setLogoBase64] = useState<string | undefined>(undefined);
   React.useEffect(() => {
-    fetch('/logo-rw.png')
+    fetch('/logo-rw.jpg')
       .then(res => res.blob())
       .then(blob => {
         const reader = new FileReader();
